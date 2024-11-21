@@ -19,7 +19,7 @@ foreach ($dir in $dirs) {
 
 # Download files
 Invoke-WebRequest -Uri "https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors?download=true" -OutFile "$HOME\comfyui-models\checkpoints\sd_xl_base_1.0.safetensors"
-Invoke-WebRequest -Uri "https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0/resolve/main/sd_xl_refiner_1.0.safetensors?download=true" -OutFile "$HOME\comfyui-models\checkpoints\sd_xl_refiner_1.0.safetensors"
+Invoke-WebRequest -Uri "https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0/resolve/main/sd_xl_refiner_1.0.safetensors?download=true" -OutFile "\comfyui-models\checkpoints\sd_xl_refiner_1.0.safetensors"
 
 # Sync with S3
 aws s3 sync "$HOME\comfyui-models" "s3://$bucket/" --region $region
