@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import boto3
 from botocore.exceptions import NoCredentialsError
 from io import BytesIO
@@ -80,7 +81,6 @@ def set_Params(prompt,colorDetail, colorBody,token):
                 print("set GlobalSeed")
     return prompt
 
-
 def upload_to_s3(file_name, file_data, bucket_name, s3_key):
     try:
         s3_client.put_object(
@@ -115,18 +115,18 @@ def get_images(prompt, client_id, server_address):
         if 'images' in node_output and node_output['images'][0]['type'] == 'output':
             images_output = []
             for image in node_output['images']:
-                image_data = comfyui_api_utils.get_image(image['filename'], image['subfolder'], image['type'], server_address, aws_alb_cookie)
-                images_output.append(image_data)
+                print(image)
+                # image_data = comfyui_api_utils.get_image(image['filename'], image['subfolder'], image['type'], server_address, aws_alb_cookie)
+                # images_output.append(image_data)
 
                 # Upload each image to S3
                 file_name = image['filename']
                 #s3_key = f"{S3_FOLDER}/{file_name}" if S3_FOLDER else file_name
-                s3_key = f"{file_name}"
-                upload_to_s3(file_name, image_data, S3_BUCKET_NAME, s3_key)
+                # s3_key = f"{file_name}"
+                # upload_to_s3(file_name, image_data, S3_BUCKET_NAME, s3_key)
 
             output_images[node_id] = images_output
     return output_images, prompt_id
-
 
 # Invoke the ComfyUI API with one workflow
 def single_inference(server_address, request_api_json):
@@ -135,7 +135,7 @@ def single_inference(server_address, request_api_json):
     with open(request_api_json, "r") as f:
         prompt = json.load(f)
     review_prompt(prompt)
-    prompt = set_Params(prompt,"5005441","12227444","Bear")
+    prompt = set_Params(prompt,"5005441","12227444","Oarfish")
     images, prompt_id = get_images(prompt, client_id, server_address)
     if SHOW_IMAGES:
         for node_id in images:
@@ -152,6 +152,9 @@ def single_inference(server_address, request_api_json):
     print(f"Num of images: {len(images)}.")
     print(f"Time spent: {timespent}s.")
     print("------")
+    
+    return images
+
 
 if __name__ == "__main__":
     # Get the file path from the command line
@@ -161,3 +164,7 @@ if __name__ == "__main__":
         print("Usage: python3 invoke_comfyui_api.py <request_api_json>")
         sys.exit(1)
     single_inference(SERVER_ADDRESS, REQUEST_API_JSON)
+
+{'filename': '\\21_11\\API_Test\\Regional_Optimized2_JasperColors_LAB\\RegionalPrompt_Optimized2_JasperColors_LABOarfish__00001_.png', 'subfolder': '', 'type': 'output'}
+{'filename': '\\21_11\\API_Test\\Regional_Optimized2_JasperColors_LAB\\RegionalPrompt_Optimized2_JasperColors_LABOarfish__Upres_00001_.png', 'subfolder': '', 'type': 'output'}
+{'filename': '\\21_11\\API_Test\\Regional_Optimized2_JasperColors_LAB\\RegionalPrompt_Optimized2_JasperColors_LABOarfish_Pallette_00001_.png', 'subfolder': '', 'type': 'output'}

@@ -20,9 +20,9 @@ spec:
         #- spot
       - key: node.kubernetes.io/instance-type
         operator: In
-        values:
-        - g5.2xlarge
-        #- g4dn.2xlarge
+        values: ["g4dn.2xlarge"]
+      - key: "accelerator"
+        operator: Exists
       - key: kubernetes.io/os
         operator: In
         values:

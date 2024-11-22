@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: comfyui
 spec:
-  replicas: 1
+  replicas: 1 # Number of replicas, KEDA will scale this up/down
   selector:
     matchLabels:
       app: comfyui
@@ -12,6 +12,14 @@ spec:
       labels:
         app: comfyui
     spec:
+      serviceAccountName: comfyui-sa
+      tolerations:
+        - key: "nvidia.com/gpu"
+          operator: "Exists"
+          effect: "NoSchedule"
+        - key: "accelerator"
+          operator: "Exists"
+          effect: "NoSchedule"
       volumes:
       - name: stable-diffusion-models
         hostPath:

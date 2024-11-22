@@ -347,7 +347,7 @@ aws eks list-access-entries --cluster-name Comfyui-Cluster|grep $identity
 Execute the following command to create a role and service account for the S3 CSI driver, enabling it to read and write to S3.
 
 ```shell
-region="us-west-2" # Modify the region to your current region.
+region="eu-west-2" # Modify the region to your current region.
 account=$(aws sts get-caller-identity --query Account --output text)
 ROLE_NAME=EKS-S3-CSI-DriverRole-$account-$region
 POLICY_ARN=arn:aws:iam::aws:policy/AmazonS3FullAccess
@@ -366,7 +366,7 @@ eksctl create iamserviceaccount \
 Run the following command to install  `aws-mountpoint-s3-csi-driver` Addon
 
 ```shell
-region="us-west-2" # Modify the region to your current region.
+region="eu-west-2" # Modify the region to your current region.
 account=$(aws sts get-caller-identity --query Account --output text)
 eksctl create addon --name aws-mountpoint-s3-csi-driver --version v1.0.0-eksbuild.1 --cluster Comfyui-Cluster --service-account-role-arn "arn:aws:iam::${account}:role/EKS-S3-CSI-DriverRole-${account}-${region}" --force
 ```
