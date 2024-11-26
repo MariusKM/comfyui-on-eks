@@ -31,12 +31,32 @@ export default class BlueprintConstruct {
                 "Type": "generic-cluster"
             },
             mastersRole: blueprints.getResource(context => {
-                return new iam.Role(context.scope, 'AdminRole', { assumedBy: new iam.AccountRootPrincipal() });
+                // Import the ECS Task Execution Role and ECS Task Role
+                const ecsTaskExecutionRole = iam.Role.fromRoleArn(context.scope, 'ImportedEcsTaskExecutionRole', 'arn:aws:iam::339712991492:role/wedgwood-ai-staging-ecs-task-execution-role', {
+                    mutable: false,
+                });
+
+                const ecsTaskRole = iam.Role.fromRoleArn(context.scope, 'ImportedEcsTaskRole', 'arn:aws:iam::339712991492:role/wedgwood-ai-staging-ecs-task-role', {
+                    mutable: false,
+                });
+
+                // Create the Admin Role with trust policies for ECS Task Roles
+                const adminRole = new iam.Role(context.scope, 'AdminRole', {
+                    assumedBy: new iam.CompositePrincipal(
+                        new iam.AccountRootPrincipal(),
+                        ecsTaskExecutionRole,
+                        ecsTaskRole
+                    ),
+                    description: 'Admin Role for Comfyui EKS Cluster',
+                });
+                return adminRole;
             }),
             managedNodeGroups: [
                 addLightWeightNodeGroup()
             ]
         });
+
+
 
         const stack = blueprints.EksBlueprint.builder()
             .addOns(
@@ -81,6 +101,19 @@ export default class BlueprintConstruct {
             .clusterProvider(clusterProvider)
             .teams()
             .build(scope, stackName, props);
+
+        const ecsSecurityGroup = ec2.SecurityGroup.fromSecurityGroupId(
+            stack,
+            'ImportedEcsSecurityGroup',
+            'sg-07882e1d9cc8e4116',
+            { mutable: false }
+        );
+
+        stack.getClusterInfo().cluster.connections.allowFrom(
+            ecsSecurityGroup,
+            ec2.Port.tcp(443),
+            'Allow ECS to communicate with the cluster'
+        )
 
         // Define IAM policy for SQS
         const sqsPolicy = new iam.PolicyStatement({
